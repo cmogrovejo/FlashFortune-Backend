@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FlashFortune.API/FlashFortune.API.csproj" />
+    <Project Path="src/FlashFortune.Application/FlashFortune.Application.csproj" />
+    <Project Path="src/FlashFortune.Domain/FlashFortune.Domain.csproj" />
+    <Project Path="src/FlashFortune.Infrastructure/FlashFortune.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FlashFortune.Application.Tests/FlashFortune.Application.Tests.csproj" />
+    <Project Path="tests/FlashFortune.Domain.Tests/FlashFortune.Domain.Tests.csproj" />
+    <Project Path="tests/FlashFortune.Infrastructure.Tests/FlashFortune.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>
