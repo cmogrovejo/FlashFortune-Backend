@@ -1,40 +1,70 @@
-# NOTE: This file is kept for CI/CD and environments that support Docker.
-# For local development on this machine, install services via Homebrew:
-#   brew install postgresql@16 redis minio
-#   brew services start postgresql@16 && brew services start redis
-#   minio server ~/minio-data --console-address :9001
-
 version: "3.9"
 
 services:
   postgres:
     image: postgres:16-alpine
+    container_name: flashfortune-postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: flashfortune
-      POSTGRES_USER: ff_user
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-flashfortune}
+      POSTGRES_USER: ${POSTGRES_USER:-ff_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-flashfortune_secure_password_2026}
+      POSTGRES_INITDB_ARGS: "-c log_statement=all"
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ff_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flashfortune-network
 
   redis:
     image: redis:7-alpine
+    container_name: flashfortune-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flashfortune-network
 
   minio:
     image: minio/minio:latest
+    container_name: flashfortune-minio
+    restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
-      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
     ports:
       - "9000:9000"
       - "9001:9001"
     volumes:
       - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flashfortune-network
 
 volumes:
   postgres_data:
+  redis_data:
   minio_data:
+
+networks:
+  flashfortune-network:
+    driver: bridge

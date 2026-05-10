@@ -39,6 +39,14 @@ ScaffoldingReadMe.txt
 # dotenv environment variables file
 .env
 
+# Local development settings (contain credentials)
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
+
+# Local-state / scratch docs
+SERVICES_STATUS.md
+
 # Others
 ~$*
 *~
